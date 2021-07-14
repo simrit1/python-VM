@@ -66,16 +66,31 @@ lbl mainLoop
         jl %cmdSep
         ldr @@-4 @-3
 
+    > Run
     cmp @1 $Run
     jne %cmdNotRun
         > allows 3 params
         exc @2 @3 @4 @5
     lbl cmdNotRun
 
+    > Start
     cmp @1 $Start
     jne %cmdNotStart
         > allows 3 params
         thr @2 @3 @4 @5
     lbl cmdNotStart
+
+    > Print
+    cmp @1 $Print
+    jne %cmdNotPrint
+        exc doc.x @2
+    lbl cmdNotPrint
+
+    > WriteTo
+    cmp @1 $WriteTo
+    jne %cmdNotWrite
+        exc writeTo.x @2
+    lbl cmdNotWrite
+
     lbl skip
 jmp %mainLoop
