@@ -10,12 +10,6 @@ lbl mainLoop
         exc doc.x help.doc
     lbl cmdNotHelp
 
-    > Documentation
-    cmp @0 $Documentation
-    jne %cmdNotDocumentation
-        exc doc.x documentation.doc
-    lbl cmdNotDocumentation
-
     > DevMode
     cmp @0 $DevMode
     jne %cmdNotDevMode
