@@ -16,6 +16,10 @@ lbl mainLoop
         exc devBoot.x
     lbl cmdNotDevMode
 
+    > Exit
+    cmp @0 $Exit
+    je %end
+
     > init for command seperation
     > clear memory up to @5
     > @-1 current iteration
@@ -94,3 +98,4 @@ lbl mainLoop
 
     lbl skip
 jmp %mainLoop
+lbl end
