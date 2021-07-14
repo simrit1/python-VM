@@ -29,8 +29,8 @@ lbl mainLoop
     jle %clearMem
 
     > if empty command skip
-    cmp @0 #0
-    je %skip
+    cmp @0 #2
+    jle %skip
         > @0 input
         > @-1 current index
         > @-2 item
@@ -65,5 +65,11 @@ lbl mainLoop
         cmp @-1 @0
         jl %cmdSep
         ldr @@-4 @-3
+    > more code goes here
+    cmp @1 $Run
+    jne %cmdNotRun
+        > allows 3 params
+        exc @2 @3 @4 @5
+    lbl cmdNotRun
     lbl skip
 jmp %mainLoop
