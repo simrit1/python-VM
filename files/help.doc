@@ -1,3 +1,11 @@
 =Commands=
 -Help-
 Prints this document
+-DevMode-
+Runs devBoot.x
+-Run-
+Params: -file *args
+Runs the passed in file with *args in the same thread as the terminal
+-Start-
+Params: -file *args
+Runs the passed in file with *args in a new thread

@@ -65,11 +65,17 @@ lbl mainLoop
         cmp @-1 @0
         jl %cmdSep
         ldr @@-4 @-3
-    > more code goes here
+
     cmp @1 $Run
     jne %cmdNotRun
         > allows 3 params
         exc @2 @3 @4 @5
     lbl cmdNotRun
+
+    cmp @1 $Start
+    jne %cmdNotStart
+        > allows 3 params
+        thr @2 @3 @4 @5
+    lbl cmdNotStart
     lbl skip
 jmp %mainLoop
