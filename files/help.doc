@@ -9,3 +9,6 @@ Runs the passed in file with *args in the same thread as the terminal
 -Start-
 Params: -file *args
 Runs the passed in file with *args in a new thread
+-WriteTo-
+Params: -file
+Allows you to append to -file

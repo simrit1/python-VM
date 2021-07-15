@@ -8,8 +8,7 @@ get @0:AA term
 cmp @0:AA Exit
 je %exit
 
-out !0:AA @0
+out !0 @0:AA
 
 jmp %loop
 lbl exit
-out term +(Exited,WriteTo,Call
