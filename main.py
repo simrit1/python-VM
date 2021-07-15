@@ -36,6 +36,8 @@ class prog:
         self.initArgs = args
     
     def getMem(self, location):
+        if ':' not in location:
+            return self.memory[location]
         reg = location.split(':')[-1]
         index = int(self.parse(':'.join(location.split(':')[:-1])))
         if reg in self.memory:
@@ -239,7 +241,13 @@ class prog:
                 raise TypeError(f'@{self.instruction}: {self.fileName}>cpy>destination: {args[0]} is not a memory address')
             if len(args) >= 2:
                 source = self.parse(args[1])
-                self.setMem(destination, render(unrender(self.getMem(destination)) + source))
+                if type(self.getMem(destination)) == dict:
+                    i = 0
+                    while i in self.getMem(destination):
+                        i += 1
+                    self.setMem(f'{i}:{destination}', source)
+                else:
+                    self.setMem(destination, render(unrender(self.getMem(destination)) + source))
             else:
                 self.setMem(destination, render(unrender(self.getMem(destination), emptyType='int') + 1))
         #sub

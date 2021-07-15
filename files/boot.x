@@ -22,6 +22,12 @@ lbl mainLoop
         out term ====================
     lbl cmdNotDevMode
 
+    > Mem
+    cmp @0:AA $Mem
+    jne %cmdNotMem
+        out term @
+    lbl cmdNotMem
+
     > Exit
     cmp @0:AA $Exit
     je %end
@@ -45,7 +51,6 @@ lbl mainLoop
         > @-1:AA current index
         > @-2:AA item
         > @-3:AA last word
-        > @-4:AA current word index
         > @-5:AA space
 
         > init @-5:AA as ' '
@@ -54,15 +59,13 @@ lbl mainLoop
 
         ldr @-1:AA #1
         spl @-3:AA @0:AA #0
-        ldr @-4:AA #1
         lbl cmdSep
             > set @-2:AA to the current char
             spl @-2:AA @0:AA @-1:AA
             > if current char is a space
             cmp @-2:AA @-5:AA
             jne %crntChrNotSpace
-                ldr @@-4:AA:AA @-3:AA
-                add @-4:AA
+                add @AA @-3:AA
                 add @-1:AA
                 spl @-3:AA @0:AA @-1:AA
                 jmp %crntChrWasSpace
@@ -74,7 +77,7 @@ lbl mainLoop
             add @-1:AA
         cmp @-1:AA @0:AA
         jl %cmdSep
-        ldr @@-4:AA:AA @-3:AA
+        add @AA @-3:AA
 
     > Run
     cmp @1:AA $Run

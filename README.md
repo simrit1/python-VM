@@ -37,6 +37,7 @@ ALL ARGS MUST BE SAME TYPE
 -Values-
 !<INT>: Arguments passed in during execution
 @<INT>:<LITERAL>: Memory address and corresponding register
+@<LITERAL>: Returns dict of that register
 #<INT/!/@>: Integer, if passed a memory address or exec arg returns int version
 $<STR/!/@>: String, if passed a memory address or exec arg returns string version
 %<LABEL>: Gets value of a label
