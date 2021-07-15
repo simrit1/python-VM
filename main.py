@@ -37,7 +37,10 @@ class prog:
     
     def getMem(self, location):
         if ':' not in location:
-            return self.memory[location]
+            if location in self.memory:
+                return self.memory[location]
+            else:
+                return {}
         reg = location.split(':')[-1]
         index = int(self.parse(':'.join(location.split(':')[:-1])))
         if reg in self.memory:
@@ -184,6 +187,12 @@ class prog:
             self.run()
     
     def setMem(self, location, value):
+        if len(location.split(':')) == 0:
+            reg = location
+            if type(value) == dict:
+                self.memory[reg] = value
+            else:
+                self.memory[reg][0] = self.parse(value)
         reg = location.split(':')[-1]
         index = int(self.parse(''.join(location.split(':')[:-1])))
         if reg in self.memory:
@@ -212,10 +221,23 @@ class prog:
             if args[0][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>ldr: {args[0]} is not a memory address')
             location = args[0]
-            index = self.parse(':'.join(location.split(':')[:-1])[1:])
-            reg = location.split(':')[-1]
             value = render(self.parse(args[1]))
-            self.setMem(':'.join([str(index), reg]), value)
+            if len(location.split(':')) == 1:
+                if value[0] == '@' and len(value.split(':')) == 1:
+                    self.setMem(location[1:], self.getMem(value[1:]))
+            else:
+                index = self.parse(':'.join(location.split(':')[:-1])[1:])
+                reg = location.split(':')[-1]
+                self.setMem(':'.join([str(index), reg]), value)
+        #clr
+        elif cmd == 'clr':
+            if args[0][0] != '@':
+                raise TypeError(f'@{self.instruction}: {self.fileName}>clr: {args[0]} is not a memory address')
+            location = args[0][1:]
+            reg = location.split(':')[-1]
+            index = self.parse(':'.join(location.split(':')[:-1]))
+            if index in self.memory[reg]:
+                self.memory[reg].pop(index)
         #mov
         elif cmd == 'mov':
             destination = self.parse(args[0][1:])

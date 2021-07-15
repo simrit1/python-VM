@@ -39,7 +39,7 @@ lbl mainLoop
     ldr @-1:AA #1
     ldr @-2:AA #5
     lbl clearMem
-        ldr @@-1:AA:AA $
+        clr @@-1:AA:AA
         add @-1:AA
     cmp @-1:AA @-2:AA
     jle %clearMem

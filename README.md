@@ -59,6 +59,7 @@ $: string
 =Commands=
 -List-
 ldr -@location -value: load -value into memory at -location
+clr -@location: delete memory value
 mov -@destination -@source: move memory at location -source to -destination, sets -source to empty
 cpy -@destination -@source: copy memory at location -source to -destination
 -Operators-
