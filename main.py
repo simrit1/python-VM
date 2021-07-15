@@ -2,7 +2,12 @@ import threading
 
 NEWLINE = f'\n'
 
-def unrender(value):
+def unrender(value, emptyType='empty'):
+    if value == 'empty':
+        if emptyType == 'int':
+            return 0
+        elif emptyType == 'str':
+            return ''
     if type(value) == str:
         if value[0] == '#':
             return int(value[1:])
@@ -30,6 +35,19 @@ class prog:
         self.fileName = file
         self.initArgs = args
     
+    def getMem(self, location):
+        reg = location.split(':')[-1]
+        index = int(self.parse(':'.join(location.split(':')[:-1])))
+        if reg in self.memory:
+            if index in self.memory[reg]:
+                return self.memory[reg][index]
+            else:
+                self.setMem(location, 'empty')
+                return 'empty'
+        else:
+            self.setMem(location, 'empty')
+            return 'empty'
+
     def parse(self, string):
         operators = ['!', '@', '#', '$']
         if string[0] == '!':
@@ -39,16 +57,21 @@ class prog:
                 return self.initArgs(self.parse(string[1:]))
         elif string[0] == '@':
             if string[1] not in operators:
-                if int(string[1:]) in self.memory:
-                    return unrender(self.memory[int(string[1:])])
+                reg = string[1:].split(':')[-1]
+                index = int(self.parse(':'.join(string[1:].split(':')[:-1])))
+                if reg in self.memory:
+                    if index in self.memory[reg]:
+                        return unrender(self.getMem(string[1:]))
+                    else:
+                        self.setMem(string[1:], 'empty')
                 else:
-                    self.memory[int(string[1:])] = 'empty'
+                    self.setMem(string[1:], 'empty')
                     return 'empty'
             else:
                 if self.parse(string[1:]) in self.memory:
-                    return self.memory[self.parse(string[1:])]
+                    return self.getMem(string[1:])
                 else:
-                    self.memory[self.parse(string[1:])] = 'empty'
+                    self.setMem(string[1:], 'empty')
                     return 'empty'
         elif string[0] == '#':
             if string[1] not in '!@':
@@ -56,7 +79,7 @@ class prog:
             else:
                 return int(self.parse(string[1:]))
         elif string[0] == '$':
-            if len(string) == 1:
+            if string == '$':
                 return ''
             elif string[1] not in '!@':
                 return string[1:]
@@ -157,6 +180,14 @@ class prog:
                 self.labels[self.parse(args[0])] = index
         while self.instruction < len(self.program):
             self.run()
+    
+    def setMem(self, location, value):
+        reg = location.split(':')[-1]
+        index = int(self.parse(''.join(location.split(':')[:-1])))
+        if reg in self.memory:
+            self.memory[reg][index] = value
+        else:
+            self.memory[reg] = {index: value}
         
     
     def run(self):
@@ -178,9 +209,11 @@ class prog:
         if cmd == 'ldr':
             if args[0][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>ldr: {args[0]} is not a memory address')
-            location = int(self.parse(args[0][1:]))
+            location = args[0]
+            index = self.parse(':'.join(location.split(':')[:-1])[1:])
+            reg = location.split(':')[-1]
             value = render(self.parse(args[1]))
-            self.memory[location] = value
+            self.setMem(':'.join([str(index), reg]), value)
         #mov
         elif cmd == 'mov':
             destination = self.parse(args[0][1:])
@@ -189,8 +222,7 @@ class prog:
                 raise TypeError(f'@{self.instruction}: {self.fileName}>mov>destination: {args[0]} is not a memory address')
             if args[1][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>mov>source: {args[1]} is not a memory address')
-            self.memory[destination] = source
-            #self.memory[args[1]] = 'empty'
+            self.setMem(destination, source)
         #cpy
         elif cmd == 'cpy':
             destination = self.parse(args[0][1:])
@@ -199,17 +231,17 @@ class prog:
                 raise TypeError(f'@{self.instruction}: {self.fileName}>cpy>destination: {args[0]} is not a memory address')
             if args[1][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>cpy>source: {args[1]} is not a memory address')
-            self.memory[destination] = source
+            self.setMem(destination, source)
         #add
         elif cmd == 'add':
-            destination = int(self.parse(args[0][1:]))
+            destination = args[0][1:]
             if args[0][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>cpy>destination: {args[0]} is not a memory address')
             if len(args) >= 2:
                 source = self.parse(args[1])
-                self.memory[destination] = render(unrender(self.memory[destination]) + source)
+                self.setMem(destination, render(unrender(self.getMem(destination)) + source))
             else:
-                self.memory[destination] = render(unrender(self.memory[destination]) + 1)
+                self.setMem(destination, render(unrender(self.getMem(destination), emptyType='int') + 1))
         #sub
         elif cmd == 'sub':
             destination = self.parse(args[0][1:])
@@ -218,41 +250,44 @@ class prog:
                 raise TypeError(f'@{self.instruction}: {self.fileName}>cpy>destination: {args[0]} is not a memory address')
             if len(args) < 2:
                 source = self.parse(args[1])
-                self.memory[destination] = render(unrender(self.memory[destination]) - source)
+                self.setMem(destination, render(unrender(self.getmem(destination)) - source))
             else:
-                self.memory[destination] = render(unrender(self.memory[destination]) - 1)
+                self.setMem(destination, render(unrender(self.getMemdestination)) - 1)
         #div
         elif cmd == 'div':
             destination = self.parse(args[0][1:])
             source = self.parse(args[1])
             if args[0][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>cpy>destination: {args[0]} is not a memory address')
-            self.memory[destination] = render(unrender(self.memory[destination]) // source)
+            self.setMem(destination, render(unrender(self.getMem(destination)) // source))
         #mul
         elif cmd == 'mul':
             destination = self.parse(args[0][1:])
             source = self.parse(args[1])
             if args[0][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>cpy>destination: {args[0]} is not a memory address')
-            self.memory[destination] = render(unrender(self.memory[destination]) * source)
+            self.setMem(destination, render(unrender(self.getMem(destination)) * source))
         #lbl
         elif cmd == 'lbl':
             pass
         #spl
         elif cmd == 'spl':
-            destination = int(self.parse(args[0][1:]))
+            destination = self.parse(args[0][1:])
             string = str(self.parse(args[1]))
             index = int(self.parse(args[2]))
             if args[0][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>cpy>destination: {args[0]} is not a memory address')
-            self.memory[destination] = string[index]
+            self.setMem(destination, string[index])
 
         #cmp
         elif cmd == 'cmp':
             self.cmp = []
             for arg in args:
-                arg = unrender(self.parse(arg))
-                self.cmp += [arg]
+                if arg[0] == '@':
+                    self.cmp += [unrender(self.getMem(arg[1:]))]
+                else:
+                    self.cmp += [unrender(self.parse(arg))]
+
         #jmp
         elif cmd == 'jmp':
             self.instruction = self.parse(args[0])
@@ -325,7 +360,7 @@ class prog:
                     file.write(f'\n{unrender(self.parse(args[1]))}')
         #get
         elif cmd == 'get':
-            destination = self.parse(args[0][1:])
+            destination = args[0][1:]
             source = self.parse(args[1])
             if args[0][0] != '@':
                 raise TypeError(f'@{self.instruction}: {self.fileName}>get>destination: {args[0]} is not a memory address')
@@ -335,11 +370,11 @@ class prog:
                     user = input()
                     if '#' in user:
                         print('You cannot use that character (#)')
-                self.memory[int(destination)] = render(user)
+                self.setMem(destination, render(user))
             else:
                 filePath = f'files/{source}'
                 with open(filePath) as file:
-                    self.memory[int(destination)] = file.read()
+                    self.setMem(destination, file.read())
         #set
         elif cmd == 'set':
             destination = self.parse(args[0])

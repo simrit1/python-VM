@@ -1,99 +1,105 @@
 lbl mainLoop
 
-    > load user input into @0
-    get @0 term
+    > load user input into @0:AA
+    get @0:AA term
 
     > One-word command checks
     > Help
-    cmp @0 $Help
+    cmp @0:AA $Help
     jne %cmdNotHelp
         exc doc.x help.doc
+        out term ====================
     lbl cmdNotHelp
 
     > DevMode
-    cmp @0 $DevMode
+    cmp @0:AA $DevMode
     jne %cmdNotDevMode
         exc devBoot.x
+        out term ====================
     lbl cmdNotDevMode
 
     > Exit
-    cmp @0 $Exit
+    cmp @0:AA $Exit
     je %end
 
     > init for command seperation
-    > clear memory up to @5
-    > @-1 current iteration
-    > @-2 max iteration
-    ldr @-1 #1
-    ldr @-2 #5
+    > clear memory up to @5:AA
+    > @-1:AA current iteration
+    > @-2:AA max iteration
+    ldr @-1:AA #1
+    ldr @-2:AA #5
     lbl clearMem
-        ldr @@-1 $
-        add @-1
-    cmp @-1 @-2
+        ldr @@-1:AA:AA $
+        add @-1:AA
+    cmp @-1:AA @-2:AA
     jle %clearMem
 
     > if empty command skip
-    cmp @0 #2
+    cmp @0:AA #2
     jle %skip
-        > @0 input
-        > @-1 current index
-        > @-2 item
-        > @-3 last word
-        > @-4 current word index
-        > @-5 space
+        > @0:AA input
+        > @-1:AA current index
+        > @-2:AA item
+        > @-3:AA last word
+        > @-4:AA current word index
+        > @-5:AA space
 
-        > init @-5 as ' '
-        ldr @-5 +(,
-        spl @-5 @-5 #0
+        > init @-5:AA as ' '
+        ldr @-5:AA +(,
+        spl @-5:AA @-5:AA #0
 
-        ldr @-1 #1
-        spl @-3 @0 #0
-        ldr @-4 #1
+        ldr @-1:AA #1
+        spl @-3:AA @0:AA #0
+        ldr @-4:AA #1
         lbl cmdSep
-            > set @-2 to the current char
-            spl @-2 @0 @-1
+            > set @-2:AA to the current char
+            spl @-2:AA @0:AA @-1:AA
             > if current char is a space
-            cmp @-2 @-5
+            cmp @-2:AA @-5:AA
             jne %crntChrNotSpace
-                ldr @@-4 @-3
-                add @-4
-                add @-1
-                spl @-3 @0 @-1
+                ldr @@-4:AA:AA @-3:AA
+                add @-4:AA
+                add @-1:AA
+                spl @-3:AA @0:AA @-1:AA
                 jmp %crntChrWasSpace
             lbl crntChrNotSpace
-            > add current char to @-3
-            add @-3 @-2
+            > add current char to @-3:AA
+            add @-3:AA @-2:AA
             lbl crntChrWasSpace
             > increment current index
-            add @-1
-        cmp @-1 @0
+            add @-1:AA
+        cmp @-1:AA @0:AA
         jl %cmdSep
-        ldr @@-4 @-3
+        ldr @@-4:AA:AA @-3:AA
 
     > Run
-    cmp @1 $Run
+    cmp @1:AA $Run
     jne %cmdNotRun
         > allows 3 params
-        exc @2 @3 @4 @5
+        exc @2:AA @3:AA @4:AA @5:AA
+        out term ====================
     lbl cmdNotRun
 
     > Start
-    cmp @1 $Start
+    cmp @1:AA $Start
     jne %cmdNotStart
         > allows 3 params
-        thr @2 @3 @4 @5
+        thr @2:AA @3:AA @4:AA @5:AA
+        out term ====================
     lbl cmdNotStart
 
     > Print
-    cmp @1 $Print
+    cmp @1:AA $Print
     jne %cmdNotPrint
-        exc doc.x @2
+        exc doc.x @2:AA
+        out term ====================
     lbl cmdNotPrint
 
     > WriteTo
-    cmp @1 $WriteTo
+    cmp @1:AA $WriteTo
     jne %cmdNotWrite
-        exc writeTo.x @2
+        exc writeTo.x @2:AA
+        out term ====================
     lbl cmdNotWrite
 
     lbl skip
