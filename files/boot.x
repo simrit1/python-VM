@@ -1,3 +1,7 @@
+out term +(Boot,Complete
+out term +(Enter,'Help',To,Get,A,List,Of,Commands
+out term ====================
+
 lbl mainLoop
 
     > load user input into @0:AA
