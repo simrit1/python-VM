@@ -1,5 +1,7 @@
 # python-VM
 A virtual machine that works in python, running it's own version of assembly
+
+Dependencies: ```python(3+)``` ```pygame```
 ```
 =Doc Syntax=
 -...: Necesary value
