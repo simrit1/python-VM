@@ -8,6 +8,15 @@ HEIGHT = 500
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 DISPLAY = {-2:WIDTH, -1:HEIGHT}
 
+def text(brightness, text, pos, size, font='courier', antiAlias=True, background=None):
+    myfont = pygame.font.SysFont(font, size)
+    colour = [brightness]*3
+    textsurface = myfont.render(text, antiAlias, colour, background)
+    x = pos[0]
+    y = pos[1]
+    window.blit(textsurface, (x, y))
+    return myfont.size(text)
+
 NEWLINE = f'\n'
 
 def unrender(value, emptyType='empty'):
@@ -259,6 +268,12 @@ class prog:
             elif args[0] == 'draw':
                 if args[1] == 'rect':
                     pygame.draw.rect(window, [unrender(self.parse(args[6]))%255]*3, ((self.parse(args[2]), self.parse(args[3])), (self.parse(args[4]), self.parse(args[5]))))
+                if args[1] == 'text':
+                    if len(args) == 8:
+                        font = self.parse(args[7])
+                    else:
+                        font = 'courier'
+                    text(self.parse(args[2]), self.parse(args[3]), (self.parse(args[4]), self.parse(args[5])), self.parse(args[6]), font)
             elif args[0] == 'key':
                 if args[1][0] != '@':
                     raise TypeError(f'@{self.instruction}: {self.fileName}>dsp key: {args[0]} is not a memory address')
@@ -267,9 +282,6 @@ class prog:
                 index = self.parse(':'.join(actualDestination.split(':')[:-1]))
                 destination = f'{index}:{reg}'
                 key = self.parse(args[2])
-                trueValue = self.parse(args[3])
-                if len(args) >= 5:
-                    falseValue = args[4]
                 keys = pygame.key.get_pressed()
                 if key == 'backspace':
                     keyDo(keys[pygame.key.K_BACKSPACE], args[3:], destination)
@@ -282,7 +294,7 @@ class prog:
                 elif key == 'pause':
                     keyDo(keys[pygame.key.K_PAUSE], args[3:], destination)
                 elif key == 'esc':
-                    keyDo(keys[pygame.key.K_ESCAPE], args[3:], destination)
+                    keyDo(keys[pygame.constants.K_ESCAPE], args[3:], destination)
                 elif key == 'space':
                     keyDo(keys[pygame.key.K_SPACE], args[3:], destination)
                 elif key == '!':

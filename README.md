@@ -200,7 +200,10 @@ ldr -@location -value: load -value into memory at -location
 clr -@location: delete memory value
 -Dsp-
     dsp update: update display
-    dsp draw rect -brightness -topX -topY -bottomX -bottomY: draw a rect at the given location
+    dsp draw rect -brightness -topX -topY -bottomX -bottomY: draws a rect with the given arguments
+    dsp draw text -brightness -text -topX -topY -size /font: draws text with the given arguments
+    dsp getx text -text -topX -topY -size /font: gets the lower x bound of a text argument
+    dsp gety text -text -topX -topY -size /font: gets the lower x bound of a text argument
     dsp key -@destination -key<LITERAL> -trueValue /falsevalue: if the key[-key] is pressed set -@destination to -trueValue, if not and /falseValue is passed in set -@destination to /falseValue
 mov -@destination -@source: move memory at location -source to -destination, sets -source to empty
 cpy -@destination -@source: copy memory at location -source to -destination
