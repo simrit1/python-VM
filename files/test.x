@@ -1,3 +1,2 @@
-out term @
-add @AA #1
-out term @
+dsp draw rect #0 #0 @-2:DISP @-1:DISP #50
+dsp update

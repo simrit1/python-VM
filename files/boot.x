@@ -1,3 +1,4 @@
+thr graphics.x boot
 out term +(Boot,Complete
 out term +(Enter,'Help',To,Get,A,List,Of,Commands
 out term ====================

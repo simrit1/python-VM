@@ -1,4 +1,12 @@
 import threading
+import pygame
+import sys
+
+pygame.init()
+WIDTH = 500
+HEIGHT = 500
+window = pygame.display.set_mode((WIDTH, HEIGHT))
+DISPLAY = {-2:WIDTH, -1:HEIGHT}
 
 NEWLINE = f'\n'
 
@@ -37,13 +45,18 @@ class prog:
     
     def getMem(self, location):
         if ':' not in location:
-            if location in self.memory:
+            if location == 'DISP':
+                return DISPLAY
+            elif location in self.memory:
                 return self.memory[location]
             else:
                 return {}
         reg = location.split(':')[-1]
         index = int(self.parse(':'.join(location.split(':')[:-1])))
-        if reg in self.memory:
+        # print(f'getMem> reg: {reg}, index: {index}')
+        if reg == 'DISP':
+            return DISPLAY[index]
+        elif reg in self.memory:
             if index in self.memory[reg]:
                 return self.memory[reg][index]
             else:
@@ -62,19 +75,10 @@ class prog:
                 return self.initArgs(self.parse(string[1:]))
         elif string[0] == '@':
             if string[1] not in operators:
-                reg = string[1:].split(':')[-1]
-                index = int(self.parse(':'.join(string[1:].split(':')[:-1])))
-                if reg in self.memory:
-                    if index in self.memory[reg]:
-                        return unrender(self.getMem(string[1:]))
-                    else:
-                        self.setMem(string[1:], 'empty')
-                else:
-                    self.setMem(string[1:], 'empty')
-                    return 'empty'
+                return unrender(self.getMem(string[1:]))
             else:
                 if self.parse(string[1:]) in self.memory:
-                    return self.getMem(string[1:])
+                    return unrender(self.getMem(string[1:]))
                 else:
                     self.setMem(string[1:], 'empty')
                     return 'empty'
@@ -187,6 +191,7 @@ class prog:
             self.run()
     
     def setMem(self, location, value):
+        global DISPLAY
         if len(location.split(':')) == 0:
             reg = location
             if type(value) == dict:
@@ -195,13 +200,22 @@ class prog:
                 self.memory[reg][0] = self.parse(value)
         reg = location.split(':')[-1]
         index = int(self.parse(''.join(location.split(':')[:-1])))
-        if reg in self.memory:
+        if reg == 'DISP':
+            if index >= 0:
+                DISPLAY[index] = value
+        elif reg in self.memory:
             self.memory[reg][index] = value
         else:
             self.memory[reg] = {index: value}
         
     
     def run(self):
+        def keyDo(boolean, args, address):
+            if boolean:
+                self.setMem(address, self.parse(args[0]))
+            else:
+                if len(args) >= 2:
+                    self.setMem(address, self.parse(args[1]))
         line = self.program[self.instruction]
         for index, char in enumerate(line):
             if char != ' ':
@@ -238,6 +252,291 @@ class prog:
             index = self.parse(':'.join(location.split(':')[:-1]))
             if index in self.memory[reg]:
                 self.memory[reg].pop(index)
+        #dsp
+        elif cmd == 'dsp':
+            if args[0] == 'update':
+                pygame.display.update()
+            elif args[0] == 'draw':
+                if args[1] == 'rect':
+                    pygame.draw.rect(window, [unrender(self.parse(args[6]))%255]*3, ((self.parse(args[2]), self.parse(args[3])), (self.parse(args[4]), self.parse(args[5]))))
+            elif args[0] == 'key':
+                if args[1][0] != '@':
+                    raise TypeError(f'@{self.instruction}: {self.fileName}>dsp key: {args[0]} is not a memory address')
+                actualDestination = args[1][1:]
+                reg = actualDestination.split(':')[-1]
+                index = self.parse(':'.join(actualDestination.split(':')[:-1]))
+                destination = f'{index}:{reg}'
+                key = self.parse(args[2])
+                trueValue = self.parse(args[3])
+                if len(args) >= 5:
+                    falseValue = args[4]
+                keys = pygame.key.get_pressed()
+                if key == 'backspace':
+                    keyDo(keys[pygame.key.K_BACKSPACE], args[3:], destination)
+                elif key == 'tab':
+                    keyDo(keys[pygame.key.K_TAB], args[3:], destination)
+                elif key == 'clear':
+                    keyDo(keys[pygame.key.K_CLEAR], args[3:], destination)
+                elif key == 'return':
+                    keyDo(keys[pygame.key.K_RETURN], args[3:], destination)
+                elif key == 'pause':
+                    keyDo(keys[pygame.key.K_PAUSE], args[3:], destination)
+                elif key == 'esc':
+                    keyDo(keys[pygame.key.K_ESCAPE], args[3:], destination)
+                elif key == 'space':
+                    keyDo(keys[pygame.key.K_SPACE], args[3:], destination)
+                elif key == '!':
+                    keyDo(keys[pygame.key.K_EXCLAIM], args[3:], destination)
+                elif key == '"':
+                    keyDo(keys[pygame.key.K_QUOTEDBL], args[3:], destination)
+                elif key == '#':
+                    keyDo(keys[pygame.key.K_HASH], args[3:], destination)
+                elif key == '$':
+                    keyDo(keys[pygame.key.K_DOLLAR], args[3:], destination)
+                elif key == '&':
+                    keyDo(keys[pygame.key.K_AMPERSAND], args[3:], destination)
+                elif key == "'":
+                    # This one might not be right
+                    keyDo(keys[pygame.key.K_QUOTE], args[3:], destination)
+                elif key == '(':
+                    keyDo(keys[pygame.key.K_LEFTPAREN], args[3:], destination)
+                elif key == ')':
+                    keyDo(keys[pygame.key.K_RIGHTPAREN], args[3:], destination)
+                elif key == '*':
+                    keyDo(keys[pygame.key.K_ASTERIX], args[3:], destination)
+                elif key == '+':
+                    keyDo(keys[pygame.key.K_PLUS], args[3:], destination)
+                elif key == ',':
+                    keyDo(keys[pygame.key.K_COMMA], args[3:], destination)
+                elif key == '-':
+                    keyDo(keys[pygame.key.K_MINUS], args[3:], destination)
+                elif key == '.':
+                    keyDo(keys[pygame.key.K_PERIOD], args[3:], destination)
+                elif key == '/':
+                    keyDo(keys[pygame.key.K_SLASH], args[3:], destination)
+                elif key == '0':
+                    keyDo(keys[pygame.key.K_0], args[3:], destination)
+                elif key == '1':
+                    keyDo(keys[pygame.key.K_1], args[3:], destination)
+                elif key == '2':
+                    keyDo(keys[pygame.key.K_2], args[3:], destination)
+                elif key == '3':
+                    keyDo(keys[pygame.key.K_3], args[3:], destination)
+                elif key == '4':
+                    keyDo(keys[pygame.key.K_4], args[3:], destination)
+                elif key == '5':
+                    keyDo(keys[pygame.key.K_5], args[3:], destination)
+                elif key == '6':
+                    keyDo(keys[pygame.key.K_6], args[3:], destination)
+                elif key == '7':
+                    keyDo(keys[pygame.key.K_7], args[3:], destination)
+                elif key == '8':
+                    keyDo(keys[pygame.key.K_8], args[3:], destination)
+                elif key == '9':
+                    keyDo(keys[pygame.key.K_9], args[3:], destination)
+                elif key == ':':
+                    keyDo(keys[pygame.key.K_COLON], args[3:], destination)
+                elif key == ';':
+                    keyDo(keys[pygame.key.K_SEMICOLON], args[3:], destination)
+                elif key == '<':
+                    keyDo(keys[pygame.key.K_LESS], args[3:], destination)
+                elif key == '=':
+                    keyDo(keys[pygame.key.K_EQUALS], args[3:], destination)
+                elif key == '>':
+                    keyDo(keys[pygame.key.K_GREATER], args[3:], destination)
+                elif key == '?':
+                    keyDo(keys[pygame.key.K_QUESTION], args[3:], destination)
+                elif key == '@':
+                    keyDo(keys[pygame.key.K_AT], args[3:], destination)
+                elif key == '[':
+                    keyDo(keys[pygame.key.K_LEFTBRACKET], args[3:], destination)
+                elif key == '\\':
+                    keyDo(keys[pygame.key.K_BACKSLASH], args[3:], destination)
+                elif key == ']':
+                    keyDo(keys[pygame.key.K_RIGHTBRACKET], args[3:], destination)
+                elif key == '^':
+                    keyDo(keys[pygame.key.K_CARET], args[3:], destination)
+                elif key == '_':
+                    keyDo(keys[pygame.key.K_UNDERSCORE], args[3:], destination)
+                elif key == '`':
+                    keyDo(keys[pygame.key.K_BACKQUOTE], args[3:], destination)
+                elif key == 'a':
+                    keyDo(keys[pygame.key.K_a], args[3:], destination)
+                elif key == 'b':
+                    keyDo(keys[pygame.key.K_b], args[3:], destination)
+                elif key == 'c':
+                    keyDo(keys[pygame.key.K_c], args[3:], destination)
+                elif key == 'd':
+                    keyDo(keys[pygame.key.K_d], args[3:], destination)
+                elif key == 'e':
+                    keyDo(keys[pygame.key.K_e], args[3:], destination)
+                elif key == 'f':
+                    keyDo(keys[pygame.key.K_f], args[3:], destination)
+                elif key == 'g':
+                    keyDo(keys[pygame.key.K_g], args[3:], destination)
+                elif key == 'h':
+                    keyDo(keys[pygame.key.K_h], args[3:], destination)
+                elif key == 'i':
+                    keyDo(keys[pygame.key.K_i], args[3:], destination)
+                elif key == 'j':
+                    keyDo(keys[pygame.key.K_j], args[3:], destination)
+                elif key == 'k':
+                    keyDo(keys[pygame.key.K_k], args[3:], destination)
+                elif key == 'l':
+                    keyDo(keys[pygame.key.K_l], args[3:], destination)
+                elif key == 'm':
+                    keyDo(keys[pygame.key.K_m], args[3:], destination)
+                elif key == 'n':
+                    keyDo(keys[pygame.key.K_n], args[3:], destination)
+                elif key == 'o':
+                    keyDo(keys[pygame.key.K_o], args[3:], destination)
+                elif key == 'p':
+                    keyDo(keys[pygame.key.K_p], args[3:], destination)
+                elif key == 'q':
+                    keyDo(keys[pygame.key.K_q], args[3:], destination)
+                elif key == 'r':
+                    keyDo(keys[pygame.key.K_r], args[3:], destination)
+                elif key == 's':
+                    keyDo(keys[pygame.key.K_s], args[3:], destination)
+                elif key == 't':
+                    keyDo(keys[pygame.key.K_t], args[3:], destination)
+                elif key == 'u':
+                    keyDo(keys[pygame.key.K_u], args[3:], destination)
+                elif key == 'v':
+                    keyDo(keys[pygame.key.K_v], args[3:], destination)
+                elif key == 'w':
+                    keyDo(keys[pygame.key.K_w], args[3:], destination)
+                elif key == 'x':
+                    keyDo(keys[pygame.key.K_x], args[3:], destination)
+                elif key == 'y':
+                    keyDo(keys[pygame.key.K_y], args[3:], destination)
+                elif key == 'z':
+                    keyDo(keys[pygame.key.K_z], args[3:], destination)
+                elif key == 'del':
+                    keyDo(keys[pygame.key.K_DELETE], args[3:], destination)
+                elif key == 'kp0':
+                    keyDo(keys[pygame.key.K_KP0], args[3:], destination)
+                elif key == 'kp1':
+                    keyDo(keys[pygame.key.K_KP1], args[3:], destination)
+                elif key == 'kp2':
+                    keyDo(keys[pygame.key.K_KP2], args[3:], destination)
+                elif key == 'kp3':
+                    keyDo(keys[pygame.key.K_KP3], args[3:], destination)
+                elif key == 'kp4':
+                    keyDo(keys[pygame.key.K_KP4], args[3:], destination)
+                elif key == 'kp5':
+                    keyDo(keys[pygame.key.K_KP5], args[3:], destination)
+                elif key == 'kp6':
+                    keyDo(keys[pygame.key.K_KP6], args[3:], destination)
+                elif key == 'kp7':
+                    keyDo(keys[pygame.key.K_KP7], args[3:], destination)
+                elif key == 'kp8':
+                    keyDo(keys[pygame.key.K_KP8], args[3:], destination)
+                elif key == 'kp9':
+                    keyDo(keys[pygame.key.K_KP9], args[3:], destination)
+                elif key == 'kp.':
+                    keyDo(keys[pygame.key.K_KP_PERIOD], args[3:], destination)
+                elif key == 'kp/':
+                    keyDo(keys[pygame.key.K_KP_DIVIDE], args[3:], destination)
+                elif key == 'kp*':
+                    keyDo(keys[pygame.key.K_KP_MULTIPLY], args[3:], destination)
+                elif key == 'kp-':
+                    keyDo(keys[pygame.key.K_KP_MINUS], args[3:], destination)
+                elif key == 'kp+':
+                    keyDo(keys[pygame.key.K_KP_PLUS], args[3:], destination)
+                elif key == 'kpEnter':
+                    keyDo(keys[pygame.key.K_KP_ENTER], args[3:], destination)
+                elif key == 'kp=':
+                    keyDo(keys[pygame.key.K_KP_EQUALS], args[3:], destination)
+                elif key == 'up':
+                    keyDo(keys[pygame.key.K_UP], args[3:], destination)
+                elif key == 'down':
+                    keyDo(keys[pygame.key.K_DOWN], args[3:], destination)
+                elif key == 'right':
+                    keyDo(keys[pygame.key.K_RIGHT], args[3:], destination)
+                elif key == 'left':
+                    keyDo(keys[pygame.key.K_LEFT], args[3:], destination)
+                elif key == 'insert':
+                    keyDo(keys[pygame.key.K_INSERT], args[3:], destination)
+                elif key == 'home':
+                    keyDo(keys[pygame.key.K_HOME], args[3:], destination)
+                elif key == 'end':
+                    keyDo(keys[pygame.key.K_END], args[3:], destination)
+                elif key == 'pageup':
+                    keyDo(keys[pygame.key.K_PAGEUP], args[3:], destination)
+                elif key == 'pagedown':
+                    keyDo(keys[pygame.key.K_PAGEDOWN], args[3:], destination)
+                elif key == 'f1':
+                    keyDo(keys[pygame.key.K_F1], args[3:], destination)
+                elif key == 'f2':
+                    keyDo(keys[pygame.key.K_F2], args[3:], destination)
+                elif key == 'f3':
+                    keyDo(keys[pygame.key.K_F3], args[3:], destination)
+                elif key == 'f4':
+                    keyDo(keys[pygame.key.K_F4], args[3:], destination)
+                elif key == 'f5':
+                    keyDo(keys[pygame.key.K_F5], args[3:], destination)
+                elif key == 'f6':
+                    keyDo(keys[pygame.key.K_F6], args[3:], destination)
+                elif key == 'f7':
+                    keyDo(keys[pygame.key.K_F7], args[3:], destination)
+                elif key == 'f8':
+                    keyDo(keys[pygame.key.K_F8], args[3:], destination)
+                elif key == 'f9':
+                    keyDo(keys[pygame.key.K_F9], args[3:], destination)
+                elif key == 'f10':
+                    keyDo(keys[pygame.key.K_F10], args[3:], destination)
+                elif key == 'f11':
+                    keyDo(keys[pygame.key.K_F11], args[3:], destination)
+                elif key == 'f12':
+                    keyDo(keys[pygame.key.K_F12], args[3:], destination)
+                elif key == 'f13':
+                    keyDo(keys[pygame.key.K_F13], args[3:], destination)
+                elif key == 'f14':
+                    keyDo(keys[pygame.key.K_F14], args[3:], destination)
+                elif key == 'f15':
+                    keyDo(keys[pygame.key.K_F15], args[3:], destination)
+                elif key == 'numlock':
+                    keyDo(keys[pygame.key.K_NUMLOCK], args[3:], destination)
+                elif key == 'capslock':
+                    keyDo(keys[pygame.key.K_CAPSLOCK], args[3:], destination)
+                elif key == 'scrollock':
+                    keyDo(keys[pygame.key.K_SCROLLOCK], args[3:], destination)
+                elif key == 'rShift':
+                    keyDo(keys[pygame.key.K_RSHIFT], args[3:], destination)
+                elif key == 'lShift':
+                    keyDo(keys[pygame.key.K_LSHIFT], args[3:], destination)
+                elif key == 'rCtrl':
+                    keyDo(keys[pygame.key.K_RCTRL], args[3:], destination)
+                elif key == 'lCtrl':
+                    keyDo(keys[pygame.key.K_LCTRL], args[3:], destination)
+                elif key == 'rAlt':
+                    keyDo(keys[pygame.key.K_RALT], args[3:], destination)
+                elif key == 'lAlt':
+                    keyDo(keys[pygame.key.K_LA], args[3:], destination)
+                elif key == 'rMeta':
+                    keyDo(keys[pygame.key.K_RMETA], args[3:], destination)
+                elif key == 'lMeta':
+                    keyDo(keys[pygame.key.K_LMETA], args[3:], destination)
+                elif key == 'rOS':
+                    keyDo(keys[pygame.key.K_RSUPER], args[3:], destination)
+                elif key == 'lOS':
+                    keyDo(keys[pygame.key.K_LSUPER], args[3:], destination)
+                elif key == 'mode':
+                    keyDo(keys[pygame.key.K_MODE], args[3:], destination)
+                elif key == 'help':
+                    keyDo(keys[pygame.key.K_HELP], args[3:], destination)
+                elif key == 'sysreq':
+                    keyDo(keys[pygame.key.K_SYSREQ], args[3:], destination)
+                elif key == 'break':
+                    keyDo(keys[pygame.key.K_BREAK], args[3:], destination)
+                elif key == 'menu':
+                    keyDo(keys[pygame.key.K_MENU], args[3:], destination)
+                elif key == 'power':
+                    keyDo(keys[pygame.key.K_POWER], args[3:], destination)
+                elif key == 'euro':
+                    keyDo(keys[pygame.key.K_EURO], args[3:], destination)
+                
         #mov
         elif cmd == 'mov':
             destination = self.parse(args[0][1:])
@@ -369,7 +668,7 @@ class prog:
         elif cmd == 'thr':
             excArgs = []
             for argument in args[1:]:
-                excArgs += self.parse(argument)
+                excArgs += [self.parse(argument)]
             try:
                 program = prog('files/' + str(self.parse(args[0])), excArgs)
                 thread = threading.Thread(target=program.start)
@@ -382,6 +681,8 @@ class prog:
             if destination  == 'term':
                 if args[1] == '@':
                     print(sorted(self.memory.items()))
+                elif args[1] == '@:DISP':
+                    print(sorted(DISPLAY.items()))
                 else:
                     print(unrender(self.parse(args[1])))
             else:
@@ -422,4 +723,11 @@ class prog:
 
 # Boot
 bootProg = prog('files/boot.x', [])
-bootProg.start()
+thread = threading.Thread(target=bootProg.start)
+thread.start()
+
+while True:
+    for event in pygame.event.get(eventtype=pygame.QUIT):
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()

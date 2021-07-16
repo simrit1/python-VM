@@ -1,7 +1,9 @@
 # python-VM
+
 A virtual machine that works in python, running it's own version of assembly
 
-Dependencies: ```python(3+)``` ```pygame```
+Dependencies: `python(3+)` `pygame`
+
 ```
 =Doc Syntax=
 -...: Necesary value
@@ -44,6 +46,140 @@ ALL ARGS MUST BE SAME TYPE
 $<STR/!/@>: String, if passed a memory address or exec arg returns string version
 %<LABEL>: Gets value of a label
 %: Gets all labels seperated by commas
+-Keys-
+    K_BACKSPACE: backspace
+    K_TAB: tab
+    K_CLEAR: clear
+    K_RETURN: return
+    K_PAUSE: pause
+    K_ESCAPE: esc
+    K_SPACE: space
+    K_EXCLAIM: !
+    K_QUOTEDBL: "
+    K_HASH: #
+    K_DOLLAR: $
+    K_AMPERSAND: &
+    K_QUOTE: ' (might not be right)
+    K_LEFTPAREN: (
+    K_RIGHTPAREN: )
+    K_ASTERIX: *
+    K_PLUS: +
+    K_COMMA: ,
+    K_MINUS: -
+    K_PERIOD: .
+    K_SLASH: /
+    K_0: 0
+    K_1: 1
+    K_2: 2
+    K_3: 3
+    K_4: 4
+    K_5: 5
+    K_6: 6
+    K_7: 7
+    K_8: 8
+    K_9: 9
+    K_COLON: :
+    K_SEMICOLON: ;
+    K_LESS: <
+    K_EQUALS: =
+    K_GREATER: >
+    K_QUESTION: ?
+    K_AT: @
+    K_LEFTBRACKET: [
+    K_BACKSLASH: \
+    K_RIGHTBRACKET: ]
+    K_CARET: ^
+    K_UNDERSCORE: _
+    K_BACKQUOTE: `
+    K_a: a
+    K_b: b
+    K_c: c
+    K_d: d
+    K_e: e
+    K_f: f
+    K_g: g
+    K_h: h
+    K_i: i
+    K_j: j
+    K_k: k
+    K_l: l
+    K_m: m
+    K_n: n
+    K_o: o
+    K_p: p
+    K_q: q
+    K_r: r
+    K_s: s
+    K_t: t
+    K_u: u
+    K_v: v
+    K_w: w
+    K_x: x
+    K_y: y
+    K_z: z
+    K_DELETE: del
+    K_KP0: kp0
+    K_KP1: kp1
+    K_KP2: kp2
+    K_KP3: kp3
+    K_KP4: kp4
+    K_KP5: kp5
+    K_KP6: kp6
+    K_KP7: kp7
+    K_KP8: kp8
+    K_KP9: kp9
+    K_KP_PERIOD: kp.
+    K_KP_DIVIDE: kp/
+    K_KP_MULTIPLY: kp*
+    K_KP_MINUS: kp-
+    K_KP_PLUS: kp+
+    K_KP_ENTER: kpEnter
+    K_KP_EQUALS: kp=
+    K_UP: up
+    K_DOWN: down
+    K_RIGHT: right
+    K_LEFT: left
+    K_INSERT: insert
+    K_HOME: home
+    K_END: end
+    K_PAGEUP: pageup
+    K_PAGEDOWN: pagedown
+    K_F1: f1
+    K_F2: f2
+    K_F3: f3
+    K_F4: f4
+    K_F5: f5
+    K_F6: f6
+    K_F7: f7
+    K_F8: f8
+    K_F9: f9
+    K_F10: f10
+    K_F11: f11
+    K_F12: f12
+    K_F13: f13
+    K_F14: f14
+    K_F15: f15
+    K_NUMLOCK: numlock
+    K_CAPSLOCK: capslock
+    K_SCROLLOCK: scrollock
+    K_RSHIFT: rShift
+    K_LSHIFT: lShift
+    K_RCTRL: rCtrl
+    K_LCTRL: lCtrl
+    K_RALT: rAlt
+    K_LALT: lAlt
+    K_RMETA: rMeta
+    K_LMETA: lMeta
+    K_RSUPER: rOS
+    K_LSUPER: lOS
+    K_MODE: mode
+    K_HELP: help
+    K_SYSREQ: sysreq
+    K_BREAK: break
+    K_MENU: menu
+    K_POWER: power
+    K_EURO: euro
+
 
 =Memory=
 -Storing Values-
@@ -62,6 +198,10 @@ $: string
 -List-
 ldr -@location -value: load -value into memory at -location
 clr -@location: delete memory value
+-Dsp-
+    dsp update: update display
+    dsp draw rect -brightness -topX -topY -bottomX -bottomY: draw a rect at the given location
+    dsp key -@destination -key<LITERAL> -trueValue /falsevalue: if the key[-key] is pressed set -@destination to -trueValue, if not and /falseValue is passed in set -@destination to /falseValue
 mov -@destination -@source: move memory at location -source to -destination, sets -source to empty
 cpy -@destination -@source: copy memory at location -source to -destination
 -Operators-
