@@ -4,6 +4,43 @@ A virtual machine that works in python, running it's own version of assembly (li
 
 ##### Dependencies:`python(3+)` `pygame`
 
+<br>
+
+---
+
+## Examples
+
+#### Fibbonacci Sequence
+
+```
+ldr @0:AA #0
+ldr @1:AA #1
+ldr @2:AA #0
+ldr @3:AA #10
+cmp !0 $boot
+j e %end
+out term +(Enter,Iteration,Max:
+get @3:AA term
+ldr @3:AA #@3:AA
+lbl end
+out term @1
+lbl loop
+add @2:AA
+ldr @-1:AA @1:AA
+ldr @1:AA [@0:AA,+,@1:AA
+ldr @0:AA @-1:AA
+out term @1:AA
+cmp @2:AA @3:AA
+j le %loop
+out term +(Prog,Complete
+```
+
+#### Hello World!
+
+```
+out term +(Hello,World!
+```
+
 ---
 
 ## Values
@@ -18,11 +55,44 @@ A virtual machine that works in python, running it's own version of assembly (li
 
 #### \#
 
-`#int`: returns an integer of value `int` can be negative
+`#int`: returns an integer of value `int`. Can be negative
 
 #### $
 
 `$string`: returns a strig of value `string`
+
+---
+
+## Arithmetic
+
+#### [`value`,`op`,`value`
+
+Using `[` allows you to make statements like `[#1,+,#1` (which returns `2`)
+
+`[` takes in comma seperated values and every odd value is an operator: `[val,op,val,op,val,op`
+
+Supported operators are: `+` `-` `/` `*` `^`
+
+Operators take place ___LEFT TO RIGHT___, `[#1,+,#2,*,#3` returns `9`
+
+<br>
+
+#### `op`(`value`,`value`
+
+Comma seperated values
+
+##### `+(` String & Int
+
+Integer: Sums all values
+
+String: Joins all strings with `' '`
+
+##### `-(` String
+
+Joins all strings without any joining character
+
+##### `*(` Int
+Multiplies all integers together
 
 ---
 
