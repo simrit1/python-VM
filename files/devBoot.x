@@ -4,8 +4,8 @@ lbl loop
 out term +(Enter,filename:
 get @0:AA term
 cmp @0:AA $Exit
-je %end
+j e %end
 exc @0:AA $boot
-jmp %loop
+j mp %loop
 lbl end
 out term +(Proccess,Complete

@@ -149,21 +149,16 @@ For non-python people: `spl destination $abc #0` will set the memory at `destina
 
 <br>
 
-## Jmp
-
-`jmp line`: jumps to `line`, `line` is intended to be a label but is parsed and can take in non label values
-
-<br>
-
 ## J Conditions
 
-- `je line`: jump to `line` if previous cmp is equal
-- `jne line`: jump to `line` if previous cmp is not equal
-- `jg line`: jump to `line` if the previous cmp is greater
-- `jge line`: jump to `line` if the previous cmp is greater or equal
-- `jl line`: jump to `line` if the previous cmp is less
-- `jle line`: jump to `line` if the previous cmp is less or equal
-- `jdv line`: jump to `line` if the previous cmp is divisible
+- `j mp line`: jump to `line`
+- `j e line`: jump to `line` if previous cmp is equal
+- `j ne line`: jump to `line` if previous cmp is not equal
+- `j g line`: jump to `line` if the previous cmp is greater
+- `j ge line`: jump to `line` if the previous cmp is greater or equal
+- `j l line`: jump to `line` if the previous cmp is less
+- `j le line`: jump to `line` if the previous cmp is less or equal
+- `j dv line`: jump to `line` if the previous cmp is divisible
 
 <br>
 

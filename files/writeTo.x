@@ -6,9 +6,9 @@ lbl loop
 get @0:AA term
 
 cmp @0:AA Exit
-je %exit
+j e %exit
 
 out !0 @0:AA
 
-jmp %loop
+j mp %loop
 lbl exit

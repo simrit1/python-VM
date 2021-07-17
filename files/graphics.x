@@ -12,8 +12,8 @@ lbl bootLoop
     dsp update
     dsp key @0:KEY esc #1 #0
     cmp @0:KEY #1
-    je %exit
-jmp %bootLoop
+    j e %exit
+j mp %bootLoop
 lbl exit
 dsp draw rect #0 #0 @-2:DISP @-1:DISP #0
 dsp update
