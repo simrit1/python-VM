@@ -52,10 +52,14 @@ A virtual machine that works in python, running it's own version of assembly (li
 - `dsp getx text destination text leftX size`: sets the memory at `destination` to the rightX bound of the given text arguments
 
     `desination` must be a memory address
+
+    This command is not currently implemented
     
 - `dsp gety text destination text topY size`: sets the memory at `destination` to the bottomY bound of the given text arguments
 
     `desination` must be a memory address
+
+    This command is not currently implemented
 
 - `dsp key destination key trueValue falseValue`: if the key `key` is currently being pressed it sets the memory address `destination` to `trueValue`, if not and `falseValue` is passed in it sets the memory address `destination` to `falseValue`
 

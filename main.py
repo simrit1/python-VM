@@ -15,6 +15,9 @@ def text(brightness, text, pos, size, font='courier', antiAlias=True, background
     x = pos[0]
     y = pos[1]
     window.blit(textsurface, (x, y))
+
+def textBounds(text, size, font='courier'):
+    myfont = pygame.font.SysFont(font, size)
     return myfont.size(text)
 
 NEWLINE = f'\n'
