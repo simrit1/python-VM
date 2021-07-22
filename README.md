@@ -1,6 +1,6 @@
 # python-VM
 
-A virtual machine that works in python, running it's own version of assembly (likely a very bad version)
+A virtual machine that works in python, running it's own version of assembly (a very bad version)
 
 ##### Dependencies:`python(3+)` `pygame`
 
@@ -51,7 +51,11 @@ out term +(Hello,World!
 
 #### @
 
-`@index:reg`: returns the value of the memory address at `self.memory[reg][index]`, `reg` is a string and `index` is an integer. This was an attempt at adding registers to increase functionality but was an incorrect implementation and should not use the term register
+`@index:reg`: returns the value of the memory address at `self.memory[reg][index]`, `reg` is a string and `index` is an integer
+
+#### *
+
+`*index:reg`: a central memory address, one program can changing this value will change for all programs
 
 #### \#
 
@@ -111,33 +115,6 @@ Multiplies all integers together
 `clr location`: removes the value at `location`
 
 `location` must be memory address
-
-<br>
-
-## Dsp
-
-- `dsp update`: updates screen
-- `dsp draw rect brightness leftX topY rightX bottomY`: draws a rectangle on the screen with `brightness` and given position arguments `leftX`, `topY`, `rightX`, `bottomY`
-- `dsp draw text brightness text leftX topY size`: draws `text` with the font size `size` and the given brightness `brightness`, the top left being at `leftX`, `topY`
-- `dsp getx text destination text leftX size`: sets the memory at `destination` to the rightX bound of the given text arguments
-
-    `desination` must be a memory address
-
-    This command is not currently implemented
-    
-- `dsp gety text destination text topY size`: sets the memory at `destination` to the bottomY bound of the given text arguments
-
-    `desination` must be a memory address
-
-    This command is not currently implemented
-
-- `dsp key destination key trueValue falseValue`: if the key `key` is currently being pressed it sets the memory address `destination` to `trueValue`, if not and `falseValue` is passed in it sets the memory address `destination` to `falseValue`
-
-    `falseValue` is an optional argument
-    
-    `destination` must be a memory address
-    
-    Documentation for available `key` values can be found in the lower part of this readme
 
 <br>
 
@@ -232,15 +209,24 @@ For non-python people: `spl destination $abc #0` will set the memory at `destina
 
 <br>
 
+## Ret
+
+`ret value`: returns `value` to the upper Exc call
+
+<br>
+
 ## Exc
 
-`exc file arg1 arg2 arg3...`: Runs the file `file` passing in all arguments in the same proccess as the program that called this command
+`exc file arg1 arg2 arg3...`: Runs the file `file` passing in all arguments in the same thread as the program that called this command (halts till program is finished)
+
+### Driver Arguments
+- `exc 'return' destination file arg1 arg2 arg3...`: sets the memory at the memory location `destination` to the return value of the program
 
 <br>
 
 ## Thr
 
-`thr file arg1 arg2 arg3...`: Does the same as Exc but in a different proccess
+`thr file arg1 arg2 arg3...`: Starts file with the passed in arguments in a different thread (call doesn't halt)
 
 <br>
 
@@ -250,7 +236,12 @@ For non-python people: `spl destination $abc #0` will set the memory at `destina
 
 `value` must be string
 
-If `destination` is `term` then print `value` to the python console, if `value` is `@` print self.memory to the python console
+### Driver Arguments
+
+- `out 'term' value`: prints `value` to the python console
+- Display
+    - `out 'dispRect' x1 y1 x2 y2 brightness`: draws a rectangle at `(x1, y1), (x2, y2)` with the brightness `brightness`
+    - `out 'dispText' text x y size brightness`: draws text at `x, y` with size `size`, the brightness `brightness`, and the size `size`
 
 <br>
 
@@ -258,9 +249,24 @@ If `destination` is `term` then print `value` to the python console, if `value` 
 
 `get destination source`: sets the memory at `destination` to the contents of the file `source`
 
+If `destination` is a register, all empty memory addresses in that register from 0 onwards will be set to each line of the given file
+
 `destination` must be a memory address
 
 If `source` is `term` set the memory at `destination` to user input from the python console
+
+### Driver Arguments
+
+- `get destination 'keys' key`: if the key `key` is currently being pressed down it sets the memory at `destination` to `$True` or `$False` accordingly
+- Text
+    - `get destination 'textX' text x size`: returns the x bound (the x location of the right side of the text) of a given text argument
+    - `get destination 'textY' text y size`: returns the y bound (the y location of the bottom of the text) of a given text argument
+
+<br>
+
+## Ext
+
+`ext`: exits the current program
 
 <br>
 
