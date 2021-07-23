@@ -240,6 +240,8 @@ For non-python people: `spl destination $abc #0` will set the memory at `destina
 
 - `out 'term' value`: prints `value` to the python console
 - Display
+    - `out disp`: updates screen
+    - `out dispClose`: closes screen
     - `out 'dispRect' x1 y1 x2 y2 brightness`: draws a rectangle at `(x1, y1), (x2, y2)` with the brightness `brightness`
     - `out 'dispText' text x y size brightness`: draws text at `x, y` with size `size`, the brightness `brightness`, and the size `size`
 

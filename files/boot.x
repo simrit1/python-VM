@@ -31,7 +31,13 @@ lbl mainLoop
 
     > Exit
     cmp @0:AA $Exit
-    j e %end
+    j ne %cmdNotExit
+    ext
+    lbl cmdNotExit
+    cmp *0:ESC $True
+    j ne %escNotPressed
+    ext
+    lbl escNotPressed
 
     > init for command seperation
     > clear memory up to @5:AA
@@ -112,4 +118,3 @@ lbl mainLoop
 
     lbl skip
 j mp %mainLoop
-lbl end

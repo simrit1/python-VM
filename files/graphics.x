@@ -1,7 +1,7 @@
 out term +(Graphics,Boot,Loop,Started
 ldr @0:AA #0
 lbl bootLoop
-    dsp draw rect #0 #0 @-2:DISP @-1:DISP @0:AA
+    out dispRect #0 #0 @-2:DISP @-1:DISP @0:AA
     add @0:AA
     ldr @0:BRT @0:AA
     div @0:BRT #255
@@ -13,13 +13,18 @@ lbl bootLoop
     j le %notTrue
     ldr @0:TXTBRT #0
     lbl notTrue
-    dsp draw text @0:TXTBRT +(Brightness:,$@0:RES #0 #0 #12
-    dsp update
-    dsp key @0:KEY esc #1 #0
-    cmp @0:KEY #1
-    j e %exit
+    out dispText +(Brightness:,$@0:RES #0 #0 #12 @0:TXTBRT
+    get @0:textY textY +(Brightness:,$@0:RES #0 #12
+    out dispText +(To,close,window,press,'esc' #0 @0:textY #12 @0:TXTBRT
+    out disp
+    get @0:KEY keys esc
+    cmp @0:KEY $True
+    j ne %notExit
+    ldr *0:ESC $True
+    out dispRect #0 #0 @-2:DISP @-1:DISP #0
+    out disp
+    out term +(Exited,Graphics,Boot,Loop
+    out dispClose
+    ext
+    lbl notExit
 j mp %bootLoop
-lbl exit
-dsp draw rect #0 #0 @-2:DISP @-1:DISP #0
-dsp update
-out term +(Exited,Graphics,Boot,Loop
