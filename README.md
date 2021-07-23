@@ -55,7 +55,7 @@ out term +(Hello,World!
 
 #### *
 
-`*index:reg`: a central memory address, one program can changing this value will change for all programs
+`*index:reg`: a central memory address, one program changing this value will change for all programs
 
 #### \#
 
