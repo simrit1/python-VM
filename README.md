@@ -240,8 +240,8 @@ For non-python people: `spl destination $abc #0` will set the memory at `destina
 
 - `out 'term' value`: prints `value` to the python console
 - Display
-    - `out disp`: updates screen
-    - `out dispClose`: closes screen
+    - `out 'disp'`: updates screen
+    - `out 'dispClose'`: closes screen
     - `out 'dispRect' x1 y1 x2 y2 brightness`: draws a rectangle at `(x1, y1), (x2, y2)` with the brightness `brightness`
     - `out 'dispText' text x y size brightness`: draws text at `x, y` with size `size`, the brightness `brightness`, and the size `size`
 
@@ -260,6 +260,10 @@ If `source` is `term` set the memory at `destination` to user input from the pyt
 ### Driver Arguments
 
 - `get destination 'keys' key`: if the key `key` is currently being pressed down it sets the memory at `destination` to `$True` or `$False` accordingly
+- Mouse
+    - `get destination 'mouseX'`: returns the x location of the mouse
+    - `get destination 'mouseY'`: returns the y location of the mouse
+    - `get destination 'mousePressed'`: if the mouse is currently pressed it sets the memory at `destination` to `$True` or `$False` accordingly
 - Text
     - `get destination 'textX' text x size`: returns the x bound (the x location of the right side of the text) of a given text argument
     - `get destination 'textY' text y size`: returns the y bound (the y location of the bottom of the text) of a given text argument
@@ -281,6 +285,12 @@ If `source` is `term` set the memory at `destination` to user input from the pyt
 ## Comments
 
 A comment is prefaced by `>`
+
+<br>
+
+## Display
+
+- Width, Height: `DISP:-2``DISP:-1`
 
 <br>
 

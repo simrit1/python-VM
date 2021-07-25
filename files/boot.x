@@ -1,4 +1,5 @@
 thr graphics.x boot
+ldr *0:EXIT $False
 out term +(Boot,Complete
 out term +(Enter,'Help',To,Get,A,List,Of,Commands
 out term ====================
@@ -32,6 +33,7 @@ lbl mainLoop
     > Exit
     cmp @0:AA $Exit
     j ne %cmdNotExit
+    ldr *0:EXIT $True
     ext
     lbl cmdNotExit
     cmp *0:ESC $True

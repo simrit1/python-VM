@@ -591,6 +591,12 @@ class prog:
             setMem(destination, textBounds(self.parse(args[2]), self.parse(args[4]))[0] + self.parse(args[3]))
         elif source == 'textY':
             setMem(destination, textBounds(self.parse(args[2]), self.parse(args[4]))[1] + self.parse(args[3]))
+        elif source == 'mouseX':
+            setMem(destination, render(pygame.mouse.get_pos()[0]))
+        elif source == 'mouseX':
+            setMem(destination, render(pygame.mouse.get_pos()[1]))
+        elif source == 'mousePressed':
+            keyDo(pygame.mouse.get_pressed()[0], destination)
 
         else:
             filePath = f'files/{source}'
